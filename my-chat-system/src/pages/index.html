@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <style>
+        /* 添加FontAwesome的样式 */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+
+        body {
+            font-family: 'Kai', 'SimSun', '宋体', serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            background-color: #f0f0f0;
+            background-image: url('D:\VS Code\my-chat-system\public\images\backgroundXs.png');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        /* 顶部图标样式 */
+        .top-icon {
+            position: fixed;
+            top: 20px; /* 根据需要调整位置 */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px; /* 根据需要调整图标大小 */
+            cursor: pointer;
+            color: #333; /* 图标颜色 */
+            transition: color 0.3s; /* 鼠标悬停时颜色变化的过渡效果 */
+        }
+
+        .top-icon:hover {
+            color: #5c6bc0; /* 鼠标悬停时的图标颜色 */
+        }
+
+        /* 居中容器样式 */
+        .center-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .home-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+        }
+
+        .home-container:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .home-greeting {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333; /* 确保文本颜色与背景有足够对比度 */
+        }
+
+        .navigation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            background-color: #4e5d6c;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            margin-bottom: 10px;
+            opacity: 0.5; /* 降低透明度 */
+        }
+
+        .nav-link.enabled {
+            opacity: 1; /* 正常透明度 */
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .home-container {
+                padding: 15px;
+            }
+
+            .nav-link {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部图标链接 -->
+    <a href="https://long-if.top/mainpage" class="top-icon" target="_blank">
+        <i class="fa fa-book"></i> <!-- 使用书的图标，您可以根据需要更换图标 -->
+    </a>
+    
+    <div class="center-container">
+        <div class="home-container">
+            <div class="home-greeting">
+                欢迎来到古风多轮对话系统
+            </div>
+            <div class="navigation">
+                <a class="nav-link" id="chatLink" href="chat-system.html">进入聊天</a>
+                <a class="nav-link" id="userCenterLink" href="user-center.html">用户中心</a>
+                <a class="nav-link" id="historyLink" href="history-chat.html">历史会话</a>
+                <a class="nav-link" id="termsLink" href="terms-and-conditions.html">隐私政策和使用条款</a>
+            </div>
+        </div>
+        <!-- 页脚 -->
+        <div class="footer">
+            版权所有 &copy; 2024 古风多轮对话系统. 保留所有权利.
+            <!--<a href="privacy-policy.html">隐私政策</a> | <a href="terms-of-use.html">使用条款</a>-->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const isAgreed = localStorage.getItem('isAgreed') === 'true';
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            function updateNavigationLinks() {
+                navLinks.forEach(link => {
+                    link.classList.toggle('enabled', isAgreed);
+                });
+            }
+
+            updateNavigationLinks();
+
+            // 监听存储变化，更新导航链接状态
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'isAgreed') {
+                    updateNavigationLinks();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

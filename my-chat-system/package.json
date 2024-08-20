@@ -1,0 +1,40 @@
+{
+  "name": "my-chat-system",
+  "version": "1.0.0",
+  "description": "A simple chat system project",
+  "main": "server/index.js",
+"scripts": {
+  "start": "node server/index.js",
+  "build": "webpack --config webpack.config.js",
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "serve": "npm run build && node index.js" 
+},
+  "keywords": [
+    "chat",
+    "system",
+    "web"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1", 
+    "react": "^16.13.1",  
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "@babel/core": "^7.10.2",
+    "babel-loader": "^8.1.0",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/preset-react": "^7.10.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miraitowa2005/my-chat-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/miraitowa2005/my-chat-system/issues"
+  },
+  "homepage": "https://github.com/miraitowa2005/my-chat-system#readme"
+}

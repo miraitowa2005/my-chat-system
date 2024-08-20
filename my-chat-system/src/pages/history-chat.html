@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会话历史浏览</title>
+    <style>
+        /* 添加FontAwesome的样式，如果使用的话 */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+
+        body {
+            font-family: 'Kai', 'SimSun', '宋体', serif; /* 使用楷体或宋体 */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            background-color: #f0f0f0;
+            background-image: url('backgroundXs.png'); /* 设置背景图片 */
+            background-size: cover; /* 使背景图片覆盖整个元素 */
+            background-attachment: fixed; /* 背景图片固定，不随滚动条滚动 */
+        }
+        .history-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .message {
+            padding: 15px;
+            border-radius: 25px;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            background-color: #e6db88;
+            color: #000000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .user-message {
+            margin-right: auto; /* 用户消息不从右侧边缘开始 */
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            background-color: rgb(0, 0, 0); /* 用户消息背景色调整为黑色 */
+            color: rgb(255, 255, 255); /* 用户消息文字颜色调整为白色 */
+        }
+        .bot-message {
+            margin-left: auto; /* 智能回复消息不从左侧边缘开始 */
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            background-color: white; /* 智能回复消息背景色调整为白色 */
+            color: black; /* 智能回复消息文字颜色调整为黑色 */
+        }
+        .timestamp {
+            font-size: 12px;
+            color: #888;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="history-container">
+        <div id="history-container"></div>
+    </div>
+
+    <script>
+        // 加载并显示历史记录
+        document.addEventListener('DOMContentLoaded', function() {
+            const history = getHistory();
+            const historyContainer = document.getElementById('history-container');
+            
+            history.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', message.role);
+
+                // 添加时间戳
+                const timestampElement = document.createElement('span');
+                timestampElement.classList.add('timestamp');
+                timestampElement.textContent = `[${new Date(message.timestamp).toLocaleTimeString()}] `;
+
+                // 添加消息内容
+                const contentElement = document.createElement('span');
+                contentElement.textContent = message.content;
+
+                messageElement.appendChild(timestampElement);
+                messageElement.appendChild(contentElement);
+                historyContainer.appendChild(messageElement);
+            });
+        });
+
+        // 从localStorage获取会话历史
+        function getHistory() {
+            const storedHistory = localStorage.getItem('chatHistory');
+            return storedHistory ? JSON.parse(storedHistory) : [];
+        }
+    </script>
+</body>
+</html>

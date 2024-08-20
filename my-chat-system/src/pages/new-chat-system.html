@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古风多轮对话系统</title>
+    <style>
+        /* 添加FontAwesome的样式，如果使用的话 */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+  
+        body {
+            font-family: 'Kai', 'SimSun', '宋体', serif; /* 使用楷体或宋体 */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            background-color: #f0f0f0;
+            background-image: url('backgroundXs.png'); /* 设置背景图片 */
+            background-size: cover; /* 使背景图片覆盖整个元素 */
+            background-attachment: fixed; /* 背景图片固定，不随滚动条滚动 */
+
+        }
+        #chat-container {
+            width: 100%;
+            max-width: 500px; /* 可根据需要调整 */
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;/* 设置固定高度，例如高度为600px，可根据需要调整 */
+            height: 600px;/* 启用垂直滚动条 */
+            overflow-y: scroll;/* 当滚动条出现时，隐藏溢出部分 */
+            overflow-x: hidden;/* 其他样式保持不变 */
+        }
+        .message-container {
+            display: flex;
+            max-width: 80%;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 25px;
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 5px;
+            max-width: 70%;
+            background-color: #e6db88;
+            color:#000000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        /* 用户消息样式 */
+        .user-message {
+            margin-right: 0; /* 用户消息不从右侧边缘开始 */
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            background-color: rgb(0, 0, 0); /* 用户消息背景色调整为黑色 */
+            color: rgb(255, 255, 255); /* 用户消息文字颜色调整为白色 */
+            position: relative; /* 为用户图标提供定位上下文 */
+        }
+        /* 智能回复消息样式 */
+        .bot-message {
+            margin-left: 0; /* 智能回复消息不从左侧边缘开始 */
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            background-color: white; /* 智能回复消息背景色调整为白色 */
+            color: black; /* 智能回复消息文字颜色调整为黑色 */
+        }
+        /* 用户图标样式，使用FontAwesome的图标 */
+        .user-message::before {
+            content: '\f007'; /* FontAwesome 用户图标 */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 24px; /* 根据需要调整大小 */
+            position: absolute;
+            right: -25px; /* 根据需要调整位置 */
+            top: 50%;
+            transform: translateY(-50%);
+            color: #333; /* 图标颜色 */
+        }
+        .input-container {
+            position: fixed;
+            bottom: 60px; /* 根据输入框高度调整底部偏移 */
+            left: 50%;
+            transform: translateX(-50%);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px); /* 减去左右的padding */
+            max-width: 500px; /* 与#chat-container一致 */
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        input[type="text"] {
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            flex-grow: 1;
+            margin-right: 10px;
+            background-color: #f5f5f5;
+        }
+        input[type="text"], button {
+            background-color: #fff; /* 输入框和按钮背景色为白色 */
+            border-color: #c0c4cc; /* 输入框和按钮边框色 */
+            color: #333; /* 文字颜色 */
+        }
+        button {
+            padding: 15px 30px;
+            background-color: #4e5d6c; /* 按钮背景色调整为墨水蓝黑色 */
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2c3e50; /* 鼠标悬停时的深墨水蓝黑色 */
+        }
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px; /* 滚动条宽度 */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #ccc; /* 滚动条滑块颜色 */
+            border-radius: 10px; /* 滚动条滑块圆角 */
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: #f0f0f0; /* 滚动条轨道颜色 */
+        }
+        /* 消息时间戳样式 */
+        .timestamp {
+            font-size: 12px;
+            color: #888;
+            margin-left: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .toolbox {
+            position: fixed; /* 固定在视口的左侧 */
+            top: 0;
+            left: 0;
+            width: 60px; /* 工具栏的宽度 */
+            height: 100%;
+            background-color: #f0f0f0; /* 工具栏背景色 */
+            z-index: 1000; /* 确保工具栏在页面其他元素之上 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            background-image: linear-gradient(to bottom, #ffffff, #000000); /* 黑白色渐变背景 */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* 更淡的阴影 */
+        }
+
+        .toolbox-button {
+            position: relative; /* 使按钮相对定位 */
+            width: 50px;
+            height: 50px;
+            margin: 10px 5px;
+            border-radius: 25px;
+            background-image: linear-gradient(to bottom, #333, #222);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 14px;
+        }
+        .toolbox-button:hover {
+            background-color: #444; /* 悬停时更深的颜色 */
+            transform: scale(1.1); /* 按钮放大效果 */
+        }
+        .toolbox-button .tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .toolbox-button:hover .tooltip {
+            display: block;
+        }
+        .toolbox-button:before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            /*margin-right: 0; /* 图标与文字的间隔 */
+            font-size: 24px;
+        }
+        .toolbox-button span {
+            display: none;
+        }
+        /* 给每个按钮添加特定的图标，这里使用了FontAwesome的图标 */
+        #toolbox .toolbox-button:nth-child(1):before {
+            content: '\f1da'; /* 历史 - 日历图标 */
+        }
+
+        #toolbox .toolbox-button:nth-child(2):before {
+            content: '\f0e0'; /* 新会话 - 信封图标 */
+        }
+
+        #toolbox .toolbox-button:nth-child(3):before {
+            content: '\f015'; /* 首页 - 首页图标 */
+        }
+
+        #toolbox .toolbox-button:nth-child(4):before {
+            content: '\f2bd'; /* 用户中心 - 用户图标 */
+        }
+
+    </style>
+</head>
+<body>
+    <div id="toolbox" class="toolbox">
+        <button class="toolbox-button" onclick="viewHistory()">
+            <span class="tooltip">历史</span>
+        </button> 
+        <button class="toolbox-button" onclick="newSession()">
+            <span class="tooltip">新会话</span>
+        </button>
+        <button class="toolbox-button" onclick="goHome()">
+            <span class="tooltip">首页</span>
+        </button>
+        <button class="toolbox-button" onclick="goUserCenter()">
+            <span class="tooltip">用户中心</span>
+        </button>
+    </div>
+    <div id="chat-container">
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="输入您的消息..." autofocus>
+            <button onclick="sendMessage()">发送</button>
+        </div>
+    </div>
+
+    <script>
+        // 聊天功能部分
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const kimiApiKey = 'sk-AmAcIvlaMvKqHsY13tTrv4E6uU9v1fMor6b5asYB1Eq8wlBs'; // 替换成你的Kimi API密钥
+
+        // 我们需要一个history数组来存储对话历史，以便实现多轮对话
+        let history = [
+            {"role": "system", "content": "你是Kimi，由Moonshot AI提供的人工智能助手。"}
+        ];
+
+        // 调用Kimi API并获取回复的函数
+        async function callKimiApi(userInput) {
+            const apiUrl = 'https://api.moonshot.cn/v1/chat/completions';
+            const model = 'moonshot-v1-8k';
+            const encodedApiKey = encodeURIComponent(kimiApiKey); // 对API密钥进行编码
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 使用encodeURIComponent对API密钥进行编码
+                        'Authorization': `Bearer ${encodedApiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            { role: 'system', content: '你是Kimi，由Moonshot AI提供的人工智能助手。' },
+                            { role: 'user', content: userInput }
+                        ],
+                        temperature: 0.3
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API调用失败: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('调用Kimi API时出错:', error);
+                return null;
+            }
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                const kimireply = await callKimiApi(message);
+                addMessage('user', message);
+                if (kimireply) {
+                    addMessage('bot', kimireply);
+                }
+                userInput.value = ''; // 清空输入框
+
+                // 更新会话历史
+                history.push({ role: 'user', content: message });
+                if (kimireply) {
+                    history.push({ role: 'bot', content: kimireply });
+                }
+
+                // 存储会话历史
+                storeHistory(history);
+            }
+        }
+
+        function addMessage(type, text) {
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-container');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', type);
+
+            // 为bot消息创建逐字输出的定时器
+            let index = 0; // 当前要显示的字符索引
+            let intervalId;
+            if (type === 'bot') {
+                intervalId = setInterval(() => {
+                    if (index < text.length) {
+                        // 逐字添加文本
+                        messageElement.textContent = text.substring(0, index) + (text.charAt(index) || '');
+                        index++;
+                    } else {
+                        // 文本全部添加完毕后停止定时器
+                        clearInterval(intervalId);
+                    }
+                }, 100); // 每100毫秒添加一个字符
+            }
+
+            // 添加时间戳
+            const timestamp = new Date().toLocaleTimeString(); // 获取当前时间
+            const timestampElement = document.createElement('span');
+            timestampElement.classList.add('timestamp');
+            timestampElement.textContent = `[${timestamp}] `;
+
+            // 根据消息类型插入图标或文本
+            if (type === 'user') {
+                messageElement.innerHTML = `<span class="user-icon"></span>${text}`;
+                messageElement.prepend(timestampElement); // 用户消息时间戳添加在消息前面
+            } else if (type === 'bot') {
+                // 初始时不显示任何文本，等待定时器逐字添加
+                messageElement.append(timestampElement); // 机器人消息时间戳添加在消息后面
+            }
+
+            messageContainer.appendChild(messageElement);
+            chatContainer.appendChild(messageContainer); // 将新消息添加到聊天容器的末尾
+            if (chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        // 存储会话历史
+        function storeHistory(history) {
+            localStorage.setItem('chatHistory', JSON.stringify(history));
+        }
+
+        // 从localStorage获取会话历史
+        function getHistory() {
+            const storedHistory = localStorage.getItem('chatHistory');
+            return storedHistory ? JSON.parse(storedHistory) : [];
+        }
+
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        addMessage('bot', '你好，我是你的对话助手。');
+    
+        // 工具栏按钮功能部分
+        function viewHistory() {
+            window.location.href = 'history-chat.html';
+            alert('查看历史会话');
+            // 这里添加查看历史会话的逻辑
+        }
+    
+        function newSession() {
+            window.location.href = 'new-chat-system.html';
+            alert('开启新会话');
+            // 这里添加开启新会话的逻辑
+        }
+    
+        function goHome() {
+            window.location.href = 'index.html';
+            alert('回到首页');
+            // 这里添加回到首页的逻辑
+        }
+    
+        function goUserCenter() {
+            window.location.href = 'user-center.html';
+            alert('用户中心');
+            // 这里添加用户中心的逻辑
+        }
+    </script>
+</body>
+</html>
